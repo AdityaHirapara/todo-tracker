@@ -25,8 +25,10 @@ function activate(context) {
         value: ''
       });
 
-      let id = context.workspaceState.get("nextId");
-      if (id === undefined) id = 0;
+      let list = context.workspaceState.get("list");
+      let id;
+      if (!list.length) id = 0;
+      else id = list[list.length-1] + 1;
 
       let task = {
         title,
@@ -35,7 +37,8 @@ function activate(context) {
         file,
       }
       context.workspaceState.update(id, task);
-      context.workspaceState.update("nextId", ++id);
+      list.push(id);
+      context.workspaceState.update("list", list);
     }
   });
 
