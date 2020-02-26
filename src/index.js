@@ -5,8 +5,32 @@ const vscode = require('vscode');
  */
 function activate(context) {
 
-	let addTask = vscode.commands.registerCommand('extension.addTask', () => {
+	let addTask = vscode.commands.registerCommand('extension.addTask', async () => {
+    const { window } = vscode;
+    const editor = window.activeTextEditor;
 
+    if (editor.selection.isEmpty) {
+      const position = editor.selection.active;
+      const file = editor.document.fileName;
+      
+      const result = await window.showInputBox({
+        placeHolder: 'Task title',
+        validateInput: text => {
+          return text === '' ? 'Empty not allowed!' : null;
+        }
+      });
+
+      let id = context.workspaceState.get("nextId");
+      if (id === undefined) id = 0;
+
+      let task = {
+        title: result,
+        position,
+        file,
+      }
+      context.workspaceState.update(id, task);
+      context.workspaceState.update("nextId", ++id);
+    }
   });
 
   let removeTask = vscode.commands.registerCommand('extension.removeTask', () => {
