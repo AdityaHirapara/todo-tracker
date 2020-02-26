@@ -1,5 +1,9 @@
+const vscode = require('vscode');
+
 function getPanelContent(tasks, linkSrc) {
   let contents = tasks.map(t => {
+    let filepath = t.file.replace(vscode.workspace.rootPath, "");
+
     return `
       <div style="line-height: 20px; margin: 20px; margin-bottom: 20px; border-bottom: 0.5px solid #d7d7d7;">
         <button onclick="openFile('${t.file}', ${t.position.line});" style="float: right; background-color: #3498DB; box-shadow: none; border: none; border-radius: 5px; cursor: pointor;">
@@ -8,7 +12,7 @@ function getPanelContent(tasks, linkSrc) {
         <h2>${t.title}</h2>
         <p>${t.description}</p>
         <div>
-          ${t.file}
+          ${filepath}
         </div>
       </div>
     `
