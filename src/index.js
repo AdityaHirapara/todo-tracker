@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const path = require('path');
 
 const { getPanelContent } = require('./taskPanel');
 
@@ -57,15 +58,44 @@ function activate(context) {
       'todoTracker',
       'TODO Tracker',
       vscode.ViewColumn.One,
-      {}
+      {
+        localResourceRoots: [vscode.Uri.file(path.join(context.extensionPath, 'media'))],
+        enableScripts: true
+      }
     );
+
+    const linkPath = vscode.Uri.file(
+      path.join(context.extensionPath, 'media', 'link.png')
+    );
+
+    const linkSrc = panel.webview.asWebviewUri(linkPath).toString();
 
     let list = context.workspaceState.get("list");
     let tasks = list.map(key => {
       return context.workspaceState.get(`todoTask${key}`)
     })
 
-    panel.webview.html = getPanelContent(tasks);
+    panel.webview.onDidReceiveMessage(
+      message => {
+        switch (message.command) {
+          case 'openfile':
+            const openPath = vscode.Uri.file(message.file);
+            vscode.commands.executeCommand('vscode.open', openPath).then(() => {
+              const { line } = window.activeTextEditor.selection.active;
+              let value = message.line - line;
+              if (value)
+                vscode.commands.executeCommand('cursorMove', {to: 'down', by: 'line', value });
+
+              return;
+            });
+            return;
+        }
+      },
+      undefined,
+      context.subscriptions
+    );
+
+    panel.webview.html = getPanelContent(tasks, linkSrc);
   });
 
 	context.subscriptions.push(addTask, removeTask, openPanel);
