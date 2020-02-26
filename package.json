@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.addTask"
+		"*"
 	],
 	"main": "src/index.js",
 	"contributes": {

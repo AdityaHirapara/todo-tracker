@@ -1,12 +1,14 @@
 const vscode = require('vscode');
 
+const { getPanelContent } = require('./taskPanel');
+
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+  const { window } = vscode;
 
 	let addTask = vscode.commands.registerCommand('extension.addTask', async () => {
-    const { window } = vscode;
     const editor = window.activeTextEditor;
 
     if (editor.selection.isEmpty) {
@@ -27,8 +29,12 @@ function activate(context) {
 
       let list = context.workspaceState.get("list");
       let id;
-      if (!list.length) id = 0;
-      else id = list[list.length-1] + 1;
+      if (!list || !list.length) {
+        id = 0;
+        list=[];
+      } else {
+        id = list[list.length-1] + 1;
+      }
 
       let task = {
         title,
@@ -36,7 +42,7 @@ function activate(context) {
         position,
         file,
       }
-      context.workspaceState.update(id, task);
+      context.workspaceState.update(`todoTask${id}`, task);
       list.push(id);
       context.workspaceState.update("list", list);
     }
@@ -47,7 +53,19 @@ function activate(context) {
   });
 
   let openPanel = vscode.commands.registerCommand('extension.openTasks', () => {
+    const panel = window.createWebviewPanel(
+      'todoTracker',
+      'TODO Tracker',
+      vscode.ViewColumn.One,
+      {}
+    );
 
+    let list = context.workspaceState.get("list");
+    let tasks = list.map(key => {
+      return context.workspaceState.get(`todoTask${key}`)
+    })
+
+    panel.webview.html = getPanelContent(tasks);
   });
 
 	context.subscriptions.push(addTask, removeTask, openPanel);
