@@ -13,18 +13,24 @@ function activate(context) {
       const position = editor.selection.active;
       const file = editor.document.fileName;
       
-      const result = await window.showInputBox({
+      const title = await window.showInputBox({
         placeHolder: 'Task title',
         validateInput: text => {
           return text === '' ? 'Empty not allowed!' : null;
         }
+      });
+      
+      const description = await window.showInputBox({
+        placeHolder: 'Describe task (if you want)',
+        value: ''
       });
 
       let id = context.workspaceState.get("nextId");
       if (id === undefined) id = 0;
 
       let task = {
-        title: result,
+        title,
+        description,
         position,
         file,
       }
