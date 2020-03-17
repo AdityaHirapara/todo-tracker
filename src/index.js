@@ -87,10 +87,7 @@ function activate(context) {
 
     const linkSrc = panel.webview.asWebviewUri(linkPath).toString();
 
-    let list = context.workspaceState.get("list");
-    let tasks = list.map(key => {
-      return context.workspaceState.get(`todoTask${key}`)
-    })
+    let treeDB = context.workspaceState.get("taskDB");
 
     panel.webview.onDidReceiveMessage(
       message => {
@@ -112,7 +109,7 @@ function activate(context) {
       context.subscriptions
     );
 
-    panel.webview.html = getPanelContent(tasks, linkSrc);
+    panel.webview.html = getPanelContent(treeDB, linkSrc);
   });
 
 	context.subscriptions.push(addTask, removeTask, openPanel);
