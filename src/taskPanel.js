@@ -2,6 +2,7 @@ const vscode = require('vscode');
 
 function getPanelContent(tasks, linkSrc) {
   let contents = tasks.map(t => {
+    // console.log(vscode.workspace.workspaceFolders[0].uri.path);
     let filepath = t.file.replace(vscode.workspace.rootPath, "");
 
     return `

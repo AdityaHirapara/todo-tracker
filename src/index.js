@@ -28,24 +28,41 @@ function activate(context) {
         value: ''
       });
 
-      let list = context.workspaceState.get("list");
-      let id;
-      if (!list || !list.length) {
-        id = 0;
-        list=[];
-      } else {
-        id = list[list.length-1] + 1;
-      }
+      let id = context.workspaceState.get("lastid") || 0;
 
       let task = {
+        id: id + 1,
         title,
         description,
         position,
         file,
       }
-      context.workspaceState.update(`todoTask${id}`, task);
-      list.push(id);
-      context.workspaceState.update("list", list);
+
+      let filepath = file.replace(vscode.workspace.rootPath, "").slice(1);
+      let taskDB = context.workspaceState.get("taskDB") || {};
+
+      let pathArr = filepath.split('/');
+      let ref = taskDB;
+      pathArr.forEach((p, i) => {
+        if (ref[p]) {
+          if (ref[p] instanceof Array) {
+            ref[p].push(task);
+          } else if (ref[p] instanceof Object) {
+            ref = ref[p];
+          }
+        } else {
+          if (i === pathArr.length - 1) {
+            ref[p] = [task];
+          } else {
+            ref[p] = {};
+            ref = ref[p];
+          }
+        }
+      });
+
+      console.log(taskDB);
+      context.workspaceState.update("taskDB", taskDB);
+      context.workspaceState.update("lastid", id+1);
     }
   });
 
