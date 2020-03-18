@@ -8,6 +8,7 @@ const { getPanelContent } = require('./taskPanel');
  */
 function activate(context) {
   const { window } = vscode;
+  let panel = undefined;
 
 	let addTask = vscode.commands.registerCommand('extension.addTask', async () => {
     const editor = window.activeTextEditor;
@@ -60,7 +61,11 @@ function activate(context) {
         }
       });
 
-      context.workspaceState.update("taskDB", taskDB);
+      context.workspaceState.update("taskDB", taskDB).then(() => {
+        if (panel) {
+          loadWebview();
+        }
+      });
       context.workspaceState.update("lastid", id+1);
     }
   });
@@ -70,7 +75,7 @@ function activate(context) {
   });
 
   let openPanel = vscode.commands.registerCommand('extension.openTasks', () => {
-    const panel = window.createWebviewPanel(
+    panel = window.createWebviewPanel(
       'todoTracker',
       'TODO Tracker',
       vscode.ViewColumn.One,
@@ -79,18 +84,6 @@ function activate(context) {
         enableScripts: true
       }
     );
-
-    const linkPath = vscode.Uri.file(
-      path.join(context.extensionPath, 'media', 'link.png')
-    );
-    const expPath = vscode.Uri.file(
-      path.join(context.extensionPath, 'media', 'expand.png')
-    );
-
-    const linkSrc = panel.webview.asWebviewUri(linkPath).toString();
-    const expSrc = panel.webview.asWebviewUri(expPath).toString();
-
-    let treeDB = context.workspaceState.get("taskDB");
 
     panel.webview.onDidReceiveMessage(
       message => {
@@ -112,8 +105,26 @@ function activate(context) {
       context.subscriptions
     );
 
-    panel.webview.html = getPanelContent(treeDB, linkSrc, expSrc);
+    loadWebview();
   });
+
+
+  function loadWebview() {
+
+    const linkPath = vscode.Uri.file(
+      path.join(context.extensionPath, 'media', 'link.png')
+    );
+    const expPath = vscode.Uri.file(
+      path.join(context.extensionPath, 'media', 'expand.png')
+    );
+
+    const linkSrc = panel.webview.asWebviewUri(linkPath).toString();
+    const expSrc = panel.webview.asWebviewUri(expPath).toString();
+
+    let treeDB = context.workspaceState.get("taskDB");
+
+    panel.webview.html = getPanelContent(treeDB, linkSrc, expSrc);
+  }
 
 	context.subscriptions.push(addTask, removeTask, openPanel);
 }

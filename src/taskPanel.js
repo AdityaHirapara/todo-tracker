@@ -18,12 +18,20 @@ function getPanelContent(taskTree, link, expand) {
       <style>
         .content {
           overflow: hidden;
-          max-height: 100vh;
+          max-height: fit-content;
           transition: max-height .25s;
         }
         .collapse {
           max-height: 0px;
           transition: max-height .25s;
+        }
+        .iconbutton {
+          float: right;
+          background-color: #3498DB;
+          box-shadow: none;
+          border: none;
+          border-radius: 5px;
+          cursor: pointor;
         }
       </style>
       <script>
@@ -135,7 +143,7 @@ function buildContent(tasks) {
 
     return `
       <div style="line-height: 20px; margin: 20px; margin-bottom: 20px; border-bottom: 0.5px solid #d7d7d7;">
-        <button onclick="openFile('${t.file}', ${t.position.line});" style="float: right; background-color: #3498DB; box-shadow: none; border: none; border-radius: 5px; cursor: pointor;">
+        <button onclick="openFile('${t.file}', ${t.position.line});" class="iconbutton">
           <img width=20 src=${linkSrc} alt="open" style="margin: 5px -2px 3px 0px;"/>
         </button>
         <h4>${t.title}</h4>
