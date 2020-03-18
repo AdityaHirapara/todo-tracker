@@ -60,7 +60,6 @@ function activate(context) {
         }
       });
 
-      console.log(taskDB);
       context.workspaceState.update("taskDB", taskDB);
       context.workspaceState.update("lastid", id+1);
     }
@@ -84,8 +83,12 @@ function activate(context) {
     const linkPath = vscode.Uri.file(
       path.join(context.extensionPath, 'media', 'link.png')
     );
+    const expPath = vscode.Uri.file(
+      path.join(context.extensionPath, 'media', 'expand.png')
+    );
 
     const linkSrc = panel.webview.asWebviewUri(linkPath).toString();
+    const expSrc = panel.webview.asWebviewUri(expPath).toString();
 
     let treeDB = context.workspaceState.get("taskDB");
 
@@ -109,7 +112,7 @@ function activate(context) {
       context.subscriptions
     );
 
-    panel.webview.html = getPanelContent(treeDB, linkSrc);
+    panel.webview.html = getPanelContent(treeDB, linkSrc, expSrc);
   });
 
 	context.subscriptions.push(addTask, removeTask, openPanel);

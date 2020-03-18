@@ -1,9 +1,11 @@
 const vscode = require('vscode');
 
 let linkSrc = '';
+let expSrc = '';
 
-function getPanelContent(taskTree, link) {
+function getPanelContent(taskTree, link, expand) {
   linkSrc = link;
+  expSrc = expand;
   let contents = traverseDFS(taskTree);
 
   return `
@@ -13,6 +15,17 @@ function getPanelContent(taskTree, link) {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>TODO Tracker</title>
+      <style>
+        .content {
+          overflow: hidden;
+          max-height: 100vh;
+          transition: max-height .25s;
+        }
+        .collapse {
+          max-height: 0px;
+          transition: max-height .25s;
+        }
+      </style>
       <script>
         const vscode = acquireVsCodeApi();
         function openFile(file, line) {
@@ -21,6 +34,18 @@ function getPanelContent(taskTree, link) {
             file,
             line,
           });
+        }
+
+        function expand(ele) {
+          let content = ele.nextSibling;
+          let icnStyle = ele.firstChild.style;
+          if (!content.classList.contains('collapse')) {
+            content.classList.add('collapse');
+            icnStyle.transform = 'rotate(-90deg)';
+          } else {
+            content.classList.remove('collapse');
+            icnStyle.transform = 'rotate(0deg)';
+          }
         }
       </script>
     </head>
@@ -57,14 +82,14 @@ function traverseDFS(root) {
       let diff = last - currDepth;
 
       while (diff--) {
-        content += '</div>';
+        content += '</div></div>';
       }
     }
 
     if (ref instanceof Array) {
-      content += `<div style="margin-left: ${currDepth*10}px"><h3>${key}</h3>`;
+      content += `<div style="margin-left: ${currDepth*10}px"><h3 style="cursor: pointer" onclick="expand(this)"><img width=20 src=${expSrc} alt="open" style="margin: 0px 0px -5px 0px; transition: .25s"/>${key}</h3><div class="content">`;
       content += buildContent(ref);
-      content += `<hr style="margin-left: ${(currDepth-1)*10}px"/></div>`;
+      content += `</div></div><hr style="margin-left: ${(currDepth)*10}px"/>`;
     } else if (ref instanceof Object) {
       let keys = Object.keys(ref);
       let EleArr = keys.map(k => {
@@ -78,7 +103,7 @@ function traverseDFS(root) {
       EleArr = sortKeys(EleArr);
       stack.push(...EleArr);
 
-      content += `<div style="margin-left: ${currDepth*10}px"><h2>${key}</h2>`;
+      content += `<div style="margin-left: ${currDepth*10}px"><h2 style="cursor: pointer" onclick="expand(this)"><img width=30 src=${expSrc} alt="open" style="margin: 0px 0px -7px -5px; transition: 0.25s"/>${key}</h2><div class="content">`;
     }
 
     last = currDepth;
