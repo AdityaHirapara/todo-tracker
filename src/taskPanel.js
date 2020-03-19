@@ -2,10 +2,12 @@ const vscode = require('vscode');
 
 let linkSrc = '';
 let expSrc = '';
+let trsSrc = '';
 
-function getPanelContent(taskTree, link, expand) {
+function getPanelContent(taskTree, link, expand, trash) {
   linkSrc = link;
   expSrc = expand;
+  trsSrc = trash;
   let contents = traverseDFS(taskTree);
 
   return `
@@ -27,11 +29,17 @@ function getPanelContent(taskTree, link, expand) {
         }
         .iconbutton {
           float: right;
-          background-color: #3498DB;
           box-shadow: none;
           border: none;
           border-radius: 5px;
           cursor: pointor;
+          margin-right: 10px;
+        }
+        .blue {
+          background-color: #3498DB;
+        }
+        .red {
+          background-color: #D73A4A;
         }
       </style>
       <script>
@@ -41,6 +49,14 @@ function getPanelContent(taskTree, link, expand) {
             command: 'openfile',
             file,
             line,
+          });
+        }
+
+        function deleteTask(id, file) {
+          vscode.postMessage({
+            command: 'deleteTask',
+            id,
+            file,
           });
         }
 
@@ -143,7 +159,10 @@ function buildContent(tasks) {
 
     return `
       <div style="line-height: 20px; margin: 20px; margin-bottom: 20px; border-bottom: 0.5px solid #d7d7d7;">
-        <button onclick="openFile('${t.file}', ${t.position.line});" class="iconbutton">
+        <button onclick="deleteTask(${t.id}, '${t.file}');" class="iconbutton red">
+          <img width=20 src=${trsSrc} alt="open" style="margin: 5px -2px 3px 0px;"/>
+        </button>
+        <button onclick="openFile('${t.file}', ${t.position.line});" class="iconbutton blue">
           <img width=20 src=${linkSrc} alt="open" style="margin: 5px -2px 3px 0px;"/>
         </button>
         <h4>${t.title}</h4>

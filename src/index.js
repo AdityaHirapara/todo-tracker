@@ -98,7 +98,43 @@ function activate(context) {
 
               return;
             });
-            return;
+          case 'deleteTask':
+            let filepath = message.file.replace(vscode.workspace.rootPath, "").slice(1);
+            let taskDB = context.workspaceState.get("taskDB") || {};
+
+            let pathArr = filepath.split('/');
+            let ref = taskDB;
+            let refArray = [taskDB];
+            
+            for (let i=0; i<pathArr.length; i++) {
+              ref = ref[pathArr[i]];
+              refArray[i+1] = ref;
+            }
+
+            refArray.reverse();
+
+            let index = ref.findIndex(t => t.id === message.id);
+            ref.splice(index, 1);
+            if (ref.length === 0) {
+              let pathLength = pathArr.length;
+
+              delete refArray[1][pathArr[pathLength-1]];
+              for (let i=1; i<refArray.length-1; i++) {
+                if (!Object.keys(refArray[i]).length) {
+                  delete refArray[i+1][pathArr[pathLength-1-i]];
+                } else {
+                  break;
+                }
+              }
+            }
+
+            context.workspaceState.update("taskDB", taskDB).then(() => {
+              if (panel) {
+                loadWebview();
+              }
+            });
+
+          return;
         }
       },
       undefined,
@@ -117,13 +153,17 @@ function activate(context) {
     const expPath = vscode.Uri.file(
       path.join(context.extensionPath, 'media', 'expand.png')
     );
+    const trsPath = vscode.Uri.file(
+      path.join(context.extensionPath, 'media', 'trash.png')
+    );
 
     const linkSrc = panel.webview.asWebviewUri(linkPath).toString();
     const expSrc = panel.webview.asWebviewUri(expPath).toString();
+    const trsSrc = panel.webview.asWebviewUri(trsPath).toString();
 
     let treeDB = context.workspaceState.get("taskDB");
 
-    panel.webview.html = getPanelContent(treeDB, linkSrc, expSrc);
+    panel.webview.html = getPanelContent(treeDB, linkSrc, expSrc, trsSrc);
   }
 
 	context.subscriptions.push(addTask, removeTask, openPanel);
