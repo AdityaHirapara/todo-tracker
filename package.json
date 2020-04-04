@@ -20,14 +20,22 @@
 				"title": "Add Task"
 			},
 			{
-				"command": "extension.removeTask",
-				"title": "Remove Task"
-			},
-			{
 				"command": "extension.openTasks",
 				"title": "Open Tasks Panel"
 			}
-		]
+		],
+		"keybindings": [
+			{
+					"command": "extension.addTask",
+					"key": "ctrl+shift+t",
+					"mac": "cmd+shift+t"
+			},
+			{
+					"command": "extension.openTasks",
+					"key": "ctrl+shift+o",
+					"mac": "cmd+shift+o"
+			}
+	]
 	},
 	"scripts": {
 		"lint": "eslint .",

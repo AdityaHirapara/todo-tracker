@@ -70,10 +70,6 @@ function activate(context) {
     }
   });
 
-  let removeTask = vscode.commands.registerCommand('extension.removeTask', () => {
-
-  });
-
   let openPanel = vscode.commands.registerCommand('extension.openTasks', () => {
     panel = window.createWebviewPanel(
       'todoTracker',
@@ -162,12 +158,12 @@ function activate(context) {
     const expSrc = panel.webview.asWebviewUri(expPath).toString();
     const trsSrc = panel.webview.asWebviewUri(trsPath).toString();
 
-    let treeDB = context.workspaceState.get("taskDB");
+    let treeDB = context.workspaceState.get("taskDB") || {};
 
     panel.webview.html = getPanelContent(treeDB, linkSrc, expSrc, trsSrc);
   }
 
-	context.subscriptions.push(addTask, removeTask, openPanel);
+	context.subscriptions.push(addTask, openPanel);
 }
 
 function deactivate() {}

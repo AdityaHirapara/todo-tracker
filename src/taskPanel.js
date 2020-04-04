@@ -210,14 +210,14 @@ function buildContent(tasks) {
     let filepath = t.file.replace(vscode.workspace.rootPath, "");
 
     return `
-      <div style="line-height: 20px; margin: 20px; margin-bottom: 20px; border-bottom: 0.5px solid #d7d7d7;">
+      <div style="line-height: 20px; margin: 10px; padding: 10px; border-radius: 8px; background-color: #161616">
         <button onclick="deleteTask(${t.id}, '${t.file}');" class="iconbutton red">
           <img width=20 src=${trsSrc} alt="open" style="margin: 5px -2px 3px 0px;"/>
         </button>
         <button onclick="openFile('${t.file}', ${t.position.line});" class="iconbutton blue">
           <img width=20 src=${linkSrc} alt="open" style="margin: 5px -2px 3px 0px;"/>
         </button>
-        <h4>${t.title}</h4>
+        <h4 style="margin-top: 0px">${t.title}</h4>
         <p>${t.description}</p>
         <div>
           ${filepath}
