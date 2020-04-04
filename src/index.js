@@ -98,6 +98,7 @@ function activate(context) {
 
               return;
             });
+          break;
           case 'deleteTask':
             let filepath = message.file.replace(vscode.workspace.rootPath, "").slice(1);
             let taskDB = context.workspaceState.get("taskDB") || {};

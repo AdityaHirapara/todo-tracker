@@ -18,14 +18,38 @@ function getPanelContent(taskTree, link, expand, trash) {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>TODO Tracker</title>
       <style>
+        body {
+          background-color: #1f1f1f;
+          color: #fff;
+        }
+        h2 {
+          margin-bottom: 5px;
+        }
+        h3 {
+          font-size: 16px;
+          margin-bottom: 5px;
+        }
+        h4 {
+          font-size: 14px;
+          margin-bottom: 5px;
+        }
         .content {
           overflow: hidden;
-          max-height: fit-content;
           transition: max-height .25s;
         }
         .collapse {
           max-height: 0px;
           transition: max-height .25s;
+        }
+        .button {
+          box-shadow: none;
+          border: none;
+          border-radius: 5px;
+          cursor: pointor;
+          margin-right: 10px;
+          padding: 5px 10px;
+          color: #fff;
+          font-weight: bold;
         }
         .iconbutton {
           float: right;
@@ -71,10 +95,38 @@ function getPanelContent(taskTree, link, expand, trash) {
             icnStyle.transform = 'rotate(0deg)';
           }
         }
+
+        function expandAll() {
+          let contents = document.getElementsByClassName('collapse');
+          Array.from(contents).reverse().forEach(ele => {
+            let icnStyle = ele.previousSibling.firstChild.style;
+            ele.classList.remove('collapse');
+            icnStyle.transform = 'rotate(0deg)';
+          });
+        }
+
+        function collapseAll() {
+          let contents = document.getElementsByClassName('content');
+          Array.from(contents).forEach(ele => {
+            let icnStyle = ele.previousSibling.firstChild.style;
+            if (!ele.classList.contains('collapse')) {
+              ele.classList.add('collapse');
+              icnStyle.transform = 'rotate(-90deg)';
+            }
+          });
+        }
       </script>
     </head>
     <body>
       <h1 style="text-align: center">TODO Tracker</h1>
+      <div>
+        <button onclick="expandAll();" class="button blue">
+          Expand All
+        </button>
+        <button onclick="collapseAll();" class="button blue">
+          Collapse All
+        </button>
+      </div>
       ${contents}
     </body>
     </html>
@@ -111,7 +163,7 @@ function traverseDFS(root) {
     }
 
     if (ref instanceof Array) {
-      content += `<div style="margin-left: ${currDepth*10}px"><h3 style="cursor: pointer" onclick="expand(this)"><img width=20 src=${expSrc} alt="open" style="margin: 0px 0px -5px 0px; transition: .25s"/>${key}</h3><div class="content">`;
+      content += `<div style="margin-left: ${currDepth*10}px"><h3 style="cursor: pointer" onclick="expand(this)"><img width=20 src=${expSrc} alt="open" style="margin: 0px 0px -5px 0px; transform: rotate(-90deg); transition: .25s"/>${key}</h3><div class="content collapse">`;
       content += buildContent(ref);
       content += `</div></div><hr style="margin-left: ${(currDepth)*10}px"/>`;
     } else if (ref instanceof Object) {
