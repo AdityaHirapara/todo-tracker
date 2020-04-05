@@ -33,6 +33,12 @@ function getPanelContent(taskTree, link, expand, trash) {
           font-size: 14px;
           margin-bottom: 5px;
         }
+        .center {
+          text-align: center;
+        }
+        .title {
+          cursor: pointer;
+        }
         .content {
           overflow: hidden;
           transition: max-height .25s;
@@ -40,6 +46,20 @@ function getPanelContent(taskTree, link, expand, trash) {
         .collapse {
           max-height: 0px;
           transition: max-height .25s;
+        }
+        .arrow {
+          margin: 0px 0px -5px 0px;
+          transition: .25s;
+        }
+        .rotated {
+          transform: rotate(-90deg);
+        }
+        .task {
+          line-height: 20px;
+          margin: 10px;
+          padding: 10px;
+          border-radius: 8px;
+          background-color: #161616;
         }
         .button {
           box-shadow: none;
@@ -64,6 +84,10 @@ function getPanelContent(taskTree, link, expand, trash) {
         }
         .red {
           background-color: #D73A4A;
+        }
+        .icon {
+          width: 20px;
+          margin: 5px -2px 3px 0px;
         }
       </style>
       <script>
@@ -118,7 +142,7 @@ function getPanelContent(taskTree, link, expand, trash) {
       </script>
     </head>
     <body>
-      <h1 style="text-align: center">TODO Tracker</h1>
+      <h1 class="center">TODO Tracker</h1>
       <div>
         <button onclick="expandAll();" class="button blue">
           Expand All
@@ -163,7 +187,7 @@ function traverseDFS(root) {
     }
 
     if (ref instanceof Array) {
-      content += `<div style="margin-left: ${currDepth*10}px"><h3 style="cursor: pointer" onclick="expand(this)"><img width=20 src=${expSrc} alt="open" style="margin: 0px 0px -5px 0px; transform: rotate(-90deg); transition: .25s"/>${key}</h3><div class="content collapse">`;
+      content += `<div style="margin-left: ${currDepth*10}px"><h3 class="title" onclick="expand(this)"><img width=20 src=${expSrc} alt="open" class="arrow rotated"/>${key}</h3><div class="content collapse">`;
       content += buildContent(ref);
       content += `</div></div><hr style="margin-left: ${(currDepth)*10}px"/>`;
     } else if (ref instanceof Object) {
@@ -179,7 +203,7 @@ function traverseDFS(root) {
       EleArr = sortKeys(EleArr);
       stack.push(...EleArr);
 
-      content += `<div style="margin-left: ${currDepth*10}px"><h2 style="cursor: pointer" onclick="expand(this)"><img width=30 src=${expSrc} alt="open" style="margin: 0px 0px -7px -5px; transition: 0.25s"/>${key}</h2><div class="content">`;
+      content += `<div style="margin-left: ${currDepth*10}px"><h2 class="title" onclick="expand(this)"><img width=30 src=${expSrc} alt="open" class="arrow"/>${key}</h2><div class="content">`;
     }
 
     last = currDepth;
@@ -210,12 +234,12 @@ function buildContent(tasks) {
     let filepath = t.file.replace(vscode.workspace.rootPath, "");
 
     return `
-      <div style="line-height: 20px; margin: 10px; padding: 10px; border-radius: 8px; background-color: #161616">
+      <div class="task">
         <button onclick="deleteTask(${t.id}, '${t.file}');" class="iconbutton red">
-          <img width=20 src=${trsSrc} alt="open" style="margin: 5px -2px 3px 0px;"/>
+          <img src=${trsSrc} alt="open" class="icon"/>
         </button>
         <button onclick="openFile('${t.file}', ${t.position.line});" class="iconbutton blue">
-          <img width=20 src=${linkSrc} alt="open" style="margin: 5px -2px 3px 0px;"/>
+          <img src=${linkSrc} alt="open" class="icon"/>
         </button>
         <h4 style="margin-top: 0px">${t.title}</h4>
         <p>${t.description}</p>
