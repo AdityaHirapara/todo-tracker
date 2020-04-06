@@ -1,13 +1,16 @@
 const vscode = require('vscode');
+const moment = require('moment');
 
 let linkSrc = '';
 let expSrc = '';
 let trsSrc = '';
+let refSrc = '';
 
-function getPanelContent(taskTree, link, expand, trash) {
+function getPanelContent(taskTree, link, expand, trash, refresh) {
   linkSrc = link;
   expSrc = expand;
   trsSrc = trash;
+  refSrc = refresh;
   let contents = traverseDFS(taskTree);
 
   return `
@@ -32,6 +35,9 @@ function getPanelContent(taskTree, link, expand, trash) {
         h4 {
           font-size: 14px;
           margin-bottom: 5px;
+        }
+        button {
+          cursor: pointer;
         }
         .center {
           text-align: center;
@@ -89,6 +95,9 @@ function getPanelContent(taskTree, link, expand, trash) {
           width: 20px;
           margin: 5px -2px 3px 0px;
         }
+        .timestamp {
+          float: right;
+        }
       </style>
       <script>
         const vscode = acquireVsCodeApi();
@@ -105,6 +114,12 @@ function getPanelContent(taskTree, link, expand, trash) {
             command: 'deleteTask',
             id,
             file,
+          });
+        }
+
+        function refresh(id, file) {
+          vscode.postMessage({
+            command: 'refresh',
           });
         }
 
@@ -144,6 +159,9 @@ function getPanelContent(taskTree, link, expand, trash) {
     <body>
       <h1 class="center">TODO Tracker</h1>
       <div>
+        <button onclick="refresh();" class="iconbutton blue">
+          <img src=${refSrc} alt="open" class="icon"/>
+        </button>
         <button onclick="expandAll();" class="button blue">
           Expand All
         </button>
@@ -243,6 +261,9 @@ function buildContent(tasks) {
         </button>
         <h4 style="margin-top: 0px">${t.title}</h4>
         <p>${t.description}</p>
+        <div class="timestamp">
+          <i>${moment(t.timestamp).fromNow()}</i>
+        </div>
         <div>
           ${filepath}
         </div>

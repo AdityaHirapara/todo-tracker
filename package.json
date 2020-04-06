@@ -26,16 +26,16 @@
 		],
 		"keybindings": [
 			{
-					"command": "extension.addTask",
-					"key": "ctrl+shift+t",
-					"mac": "cmd+shift+t"
+				"command": "extension.addTask",
+				"key": "ctrl+shift+t",
+				"mac": "cmd+shift+t"
 			},
 			{
-					"command": "extension.openTasks",
-					"key": "ctrl+shift+o",
-					"mac": "cmd+shift+o"
+				"command": "extension.openTasks",
+				"key": "ctrl+shift+o",
+				"mac": "cmd+shift+o"
 			}
-	]
+		]
 	},
 	"scripts": {
 		"lint": "eslint .",
@@ -52,5 +52,8 @@
 		"mocha": "^7.0.1",
 		"typescript": "^3.7.5",
 		"vscode-test": "^1.3.0"
+	},
+	"dependencies": {
+		"moment": "^2.24.0"
 	}
 }

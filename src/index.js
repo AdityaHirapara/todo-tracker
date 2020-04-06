@@ -37,6 +37,7 @@ function activate(context) {
         description,
         position,
         file,
+        timestamp: new Date(),
       }
 
       let filepath = file.replace(vscode.workspace.rootPath, "").slice(1);
@@ -95,6 +96,7 @@ function activate(context) {
               return;
             });
           break;
+
           case 'deleteTask':
             let filepath = message.file.replace(vscode.workspace.rootPath, "").slice(1);
             let taskDB = context.workspaceState.get("taskDB") || {};
@@ -130,7 +132,10 @@ function activate(context) {
                 loadWebview();
               }
             });
+          break;
 
+          case 'refresh':
+            loadWebview();
           return;
         }
       },
@@ -153,14 +158,18 @@ function activate(context) {
     const trsPath = vscode.Uri.file(
       path.join(context.extensionPath, 'media', 'trash.png')
     );
+    const refreshPath = vscode.Uri.file(
+      path.join(context.extensionPath, 'media', 'refresh.png')
+    );
 
     const linkSrc = panel.webview.asWebviewUri(linkPath).toString();
     const expSrc = panel.webview.asWebviewUri(expPath).toString();
     const trsSrc = panel.webview.asWebviewUri(trsPath).toString();
+    const refreshSrc = panel.webview.asWebviewUri(refreshPath).toString();
 
     let treeDB = context.workspaceState.get("taskDB") || {};
 
-    panel.webview.html = getPanelContent(treeDB, linkSrc, expSrc, trsSrc);
+    panel.webview.html = getPanelContent(treeDB, linkSrc, expSrc, trsSrc, refreshSrc);
   }
 
 	context.subscriptions.push(addTask, openPanel);
