@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 const path = require('path');
+const taskTreeView = require("./taskTreeView");
 
 const { getPanelContent } = require('./taskPanel');
 
@@ -146,6 +147,20 @@ function activate(context) {
     loadWebview();
   });
 
+  vscode.commands.registerCommand('extension.openFile', (file, position) => {
+    const openPath = vscode.Uri.file(file);
+    vscode.commands.executeCommand('vscode.open', openPath).then(() => {
+      const { line } = window.activeTextEditor.selection.active;
+      let value = position.line - line;
+      if (value)
+        vscode.commands.executeCommand('cursorMove', {to: 'down', by: 'line', value });
+      return;
+    });
+  });
+
+  const tasksProvider = new taskTreeView.TaskNodeProvider(vscode.workspace.rootPath, context.workspaceState.get("taskDB"));
+  vscode.window.registerTreeDataProvider('todoTasks', tasksProvider);
+  vscode.commands.registerCommand('todoTasks.refreshEntry', () => tasksProvider.refresh());
 
   function loadWebview() {
 

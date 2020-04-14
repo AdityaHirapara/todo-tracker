@@ -14,6 +14,23 @@
 	],
 	"main": "src/index.js",
 	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "task-explorer",
+					"title": "Task Explorer",
+					"icon": "media/dark/dependency.svg"
+				}
+			]
+		},
+		"views": {
+			"task-explorer": [
+				{
+					"id": "todoTasks",
+					"name": "TODO Tasks"
+				}
+			]
+		},
 		"commands": [
 			{
 				"command": "extension.addTask",
@@ -22,8 +39,25 @@
 			{
 				"command": "extension.openTasks",
 				"title": "Open Tasks Panel"
+			},
+			{
+				"command": "todoTasks.refreshEntry",
+				"title": "Refresh",
+				"icon": {
+					"light": "media/light/refresh.svg",
+					"dark": "media/dark/refresh.svg"
+				}
 			}
 		],
+		"menus": {
+			"view/title": [
+				{
+					"command": "todoTasks.refreshEntry",
+					"when": "view == todoTasks",
+					"group": "navigation"
+				}
+			]
+		},
 		"keybindings": [
 			{
 				"command": "extension.addTask",
