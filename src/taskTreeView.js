@@ -33,7 +33,8 @@ class TaskNodeProvider {
     if (pathArr[0] === "") {
       let ref = this.taskDB;
       return Object.keys(ref).map(t => {
-        return new Task(t, vscode.TreeItemCollapsibleState.Collapsed, [t]);
+        const icon = ref[t] instanceof Array? 'document': 'folder';
+        return new Task(t, vscode.TreeItemCollapsibleState.Collapsed, [t], icon);
       });
     } else {
       let ref = this.taskDB;
@@ -43,7 +44,7 @@ class TaskNodeProvider {
 
       if (ref instanceof Array) {
         return ref.map(t => {
-          return new Task(t.title, vscode.TreeItemCollapsibleState.None, t.file, t.description, t.position, {
+          return new Task(t.title, vscode.TreeItemCollapsibleState.None, t.file, 'task', t.description, t.position, {
             command: 'extension.openFile',
             title: '',
             arguments: [t.file, t.position]
@@ -51,9 +52,10 @@ class TaskNodeProvider {
         });
       } else if (ref instanceof Object) {
         return Object.keys(ref).map(t => {
+          const icon = ref[t] instanceof Array? 'document': 'folder';
           let temp = [...pathArr];
           temp.push(t);
-          return new Task(t, vscode.TreeItemCollapsibleState.Collapsed, temp);
+          return new Task(t, vscode.TreeItemCollapsibleState.Collapsed, temp, icon);
         });
       }
     }
@@ -62,7 +64,7 @@ class TaskNodeProvider {
 
 exports.TaskNodeProvider = TaskNodeProvider;
 class Task extends vscode.TreeItem {
-  constructor(label, collapsibleState, file, desc, position, command) {
+  constructor(label, collapsibleState, file, icon, desc, position, command) {
     super(label, collapsibleState);
     this.label = label;
     this.collapsibleState = collapsibleState;
@@ -71,16 +73,16 @@ class Task extends vscode.TreeItem {
     this.position = position;
     this.command = command;
     this.iconPath = {
-      light: path.join(__filename, '..', '..', 'media', 'light', 'dependency.svg'),
-      dark: path.join(__filename, '..', '..', 'media', 'dark', 'dependency.svg')
+      light: path.join(__filename, '..', '..', 'media', 'light', icon + '.svg'),
+      dark: path.join(__filename, '..', '..', 'media', 'dark', icon + '.svg')
     };
     this.contextValue = 'task';
   }
   get tooltip() {
-    return `${this.label}-${this.desc}`;
+    return this.desc? `${this.label} - ${this.desc}`: this.label;
   }
   get description() {
-    return this.desc;
+    return this.desc || '';
   }
 }
 

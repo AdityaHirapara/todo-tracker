@@ -24,7 +24,11 @@ function activate(context) {
           return text === '' ? 'Empty not allowed!' : null;
         }
       });
-      
+
+      if (!title) {
+        return;
+      }
+
       const description = await window.showInputBox({
         placeHolder: 'Describe task (if you want)',
         value: ''
@@ -99,40 +103,7 @@ function activate(context) {
           break;
 
           case 'deleteTask':
-            let filepath = message.file.replace(vscode.workspace.rootPath, "").slice(1);
-            let taskDB = context.workspaceState.get("taskDB") || {};
-
-            let pathArr = filepath.split('/');
-            let ref = taskDB;
-            let refArray = [taskDB];
-            
-            for (let i=0; i<pathArr.length; i++) {
-              ref = ref[pathArr[i]];
-              refArray[i+1] = ref;
-            }
-
-            refArray.reverse();
-
-            let index = ref.findIndex(t => t.id === message.id);
-            ref.splice(index, 1);
-            if (ref.length === 0) {
-              let pathLength = pathArr.length;
-
-              delete refArray[1][pathArr[pathLength-1]];
-              for (let i=1; i<refArray.length-1; i++) {
-                if (!Object.keys(refArray[i]).length) {
-                  delete refArray[i+1][pathArr[pathLength-1-i]];
-                } else {
-                  break;
-                }
-              }
-            }
-
-            context.workspaceState.update("taskDB", taskDB).then(() => {
-              if (panel) {
-                loadWebview();
-              }
-            });
+            deleteTasks(message.file, message.id);
           break;
 
           case 'refresh':
@@ -146,6 +117,8 @@ function activate(context) {
 
     loadWebview();
   });
+
+  context.subscriptions.push(addTask, openPanel);
 
   vscode.commands.registerCommand('extension.openFile', (file, position) => {
     const openPath = vscode.Uri.file(file);
@@ -161,6 +134,7 @@ function activate(context) {
   const tasksProvider = new taskTreeView.TaskNodeProvider(vscode.workspace.rootPath, context.workspaceState.get("taskDB"));
   vscode.window.registerTreeDataProvider('todoTasks', tasksProvider);
   vscode.commands.registerCommand('todoTasks.refreshEntry', () => tasksProvider.refresh());
+  vscode.commands.registerCommand('todoTasks.addTask', () => vscode.commands.executeCommand('extension.addTask'));
 
   function loadWebview() {
 
@@ -187,7 +161,42 @@ function activate(context) {
     panel.webview.html = getPanelContent(treeDB, linkSrc, expSrc, trsSrc, refreshSrc);
   }
 
-	context.subscriptions.push(addTask, openPanel);
+  function deleteTasks(file, id) {
+    let filepath = file.replace(vscode.workspace.rootPath, "").slice(1);
+    let taskDB = context.workspaceState.get("taskDB") || {};
+
+    let pathArr = filepath.split('/');
+    let ref = taskDB;
+    let refArray = [taskDB];
+
+    for (let i=0; i<pathArr.length; i++) {
+      ref = ref[pathArr[i]];
+      refArray[i+1] = ref;
+    }
+
+    refArray.reverse();
+
+    let index = ref.findIndex(t => t.id === id);
+    ref.splice(index, 1);
+    if (ref.length === 0) {
+      let pathLength = pathArr.length;
+
+      delete refArray[1][pathArr[pathLength-1]];
+      for (let i=1; i<refArray.length-1; i++) {
+        if (!Object.keys(refArray[i]).length) {
+          delete refArray[i+1][pathArr[pathLength-1-i]];
+        } else {
+          break;
+        }
+      }
+    }
+
+    context.workspaceState.update("taskDB", taskDB).then(() => {
+      if (panel) {
+        loadWebview();
+      }
+    });
+  }
 }
 
 function deactivate() {}

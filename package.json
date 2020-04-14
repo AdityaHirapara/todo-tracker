@@ -19,7 +19,7 @@
 				{
 					"id": "task-explorer",
 					"title": "Task Explorer",
-					"icon": "media/dark/dependency.svg"
+					"icon": "media/logo.png"
 				}
 			]
 		},
@@ -47,12 +47,25 @@
 					"light": "media/light/refresh.svg",
 					"dark": "media/dark/refresh.svg"
 				}
+			},
+			{
+				"command": "todoTasks.addTask",
+				"title": "Add",
+				"icon": {
+					"light": "media/light/add.svg",
+					"dark": "media/dark/add.svg"
+				}
 			}
 		],
 		"menus": {
 			"view/title": [
 				{
 					"command": "todoTasks.refreshEntry",
+					"when": "view == todoTasks",
+					"group": "navigation"
+				},
+				{
+					"command": "todoTasks.addTask",
 					"when": "view == todoTasks",
 					"group": "navigation"
 				}
